@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>彩盒计价器</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    background: #f5f5f5;
+    color: #333;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+  h1 { text-align: center; font-size: 22px; margin: 10px 0 20px; color: #1a73e8; }
+  
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  }
+  .card h2 {
+    font-size: 16px;
+    color: #555;
+    border-bottom: 2px solid #1a73e8;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+  }
+
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+  .row label { min-width: 70px; font-size: 14px; color: #666; }
+  .row input, .row select {
+    padding: 7px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    flex: 1;
+    min-width: 80px;
+  }
+  .row input:focus, .row select:focus {
+    border-color: #1a73e8;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(26,115,232,0.15);
+  }
+  .unit { font-size: 13px; color: #999; white-space: nowrap; }
+
+  .checks { display: flex; flex-wrap: wrap; gap: 8px; }
+  .checks label {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 14px; cursor: pointer;
+    padding: 4px 10px; border-radius: 16px;
+    border: 1px solid #ddd; background: #fafafa;
+    user-select: none;
+  }
+  .checks label.checked { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
+  .checks input[type=checkbox] { display: none; }
+
+  .sub-options { margin-left: 20px; margin-top: 4px; display: none; }
+  .sub-options.show { display: flex; gap: 8px; }
+  .sub-options label {
+    font-size: 13px; cursor: pointer; padding: 3px 10px;
+    border-radius: 12px; border: 1px solid #ddd; background: #fff;
+  }
+  .sub-options label.sel { background: #1a73e8; color: #fff; border-color: #1a73e8; }
+  .sub-options input[type=radio] { display: none; }
+
+  .result {
+    background: linear-gradient(135deg, #1a73e8, #1557b0);
+    color: #fff; border-radius: 10px; padding: 20px;
+    text-align: center;
+  }
+  .result .big { font-size: 32px; font-weight: bold; margin: 8px 0; }
+  .result .label { font-size: 13px; opacity: 0.85; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  table td, table th {
+    padding: 8px 10px; font-size: 13px; text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+  table th { color: #999; font-weight: normal; }
+  table tr:last-child td { border-bottom: none; font-weight: bold; color: #1a73e8; }
+  .auto-info { font-size: 13px; color: #888; margin-top: 8px; line-height: 1.8; }
+  .auto-info span { color: #333; font-weight: bold; }
+
+  @media (max-width: 500px) {
+    .row { flex-direction: column; align-items: stretch; }
+    .row label { min-width: auto; }
+  }
+</style>
+</head>
+<body>
+
+<h1>📦 彩盒报价计算器</h1>
+
+<!-- 1. 刀版尺寸 -->
+<div class="card">
+  <h2>📐 刀版尺寸</h2>
+  <div class="row">
+    <label>长</label><input type="number" id="knifeL" placeholder="mm" step="0.1" oninput="calc()">
+    <label>宽</label><input type="number" id="knifeW" placeholder="mm" step="0.1" oninput="calc()">
+    <span class="unit">mm</span>
+  </div>
+  <div class="auto-info">
+    面纸尺寸：<span id="faceSize">—</span> &nbsp;|&nbsp;
+    浪纸尺寸：<span id="fluteSize">—</span>
+  </div>
+</div>
+
+<!-- 2. 面纸 -->
+<div class="card">
+  <h2>📄 面纸</h2>
+  <div class="row">
+    <label>吨价</label><input type="number" id="faceTon" placeholder="元/吨" step="1" oninput="calc()">
+    <span class="unit">元/吨</span>
+    <label>克重</label><input type="number" id="faceGram" placeholder="g/㎡" step="1" oninput="calc()">
+    <span class="unit">g/㎡</span>
+  </div>
+</div>
+
+<!-- 3. 浪纸 -->
+<div class="card">
+  <h2>📦 浪纸</h2>
+  <div class="row">
+    <label>平方单价</label><input type="number" id="flutePrice" placeholder="元/㎡" step="0.01" oninput="calc()">
+    <span class="unit">元/㎡</span>
+  </div>
+</div>
+
+<!-- 4. 印刷 -->
+<div class="card">
+  <h2>🖨️ 印刷</h2>
+  <div class="row">
+    <label>色数</label>
+    <select id="colorCount" onchange="calc()">
+      <option value="4">4色</option>
+      <option value="5">5色</option>
+    </select>
+  </div>
+  <div class="auto-info">自动匹配机台：<span id="printMachine">—</span></div>
+</div>
+
+<!-- 5. 后道工序 -->
+<div class="card">
+  <h2>🔧 后道工序</h2>
+  <div class="checks" id="finishingChecks">
+    <label><input type="checkbox" data-key="laminate" onchange="toggleCheck(this);calc()">覆膜</label>
+    <div class="sub-options" data-parent="laminate">
+      <label><input type="radio" name="lamType" value="亮膜" onchange="calc()" checked>亮膜</label>
+      <label><input type="radio" name="lamType" value="哑膜" onchange="calc()">哑膜</label>
+    </div>
+    <label><input type="checkbox" data-key="oil" onchange="toggleCheck(this);calc()">上油</label>
+    <div class="sub-options" data-parent="oil">
+      <label><input type="radio" name="oilType" value="亮油" onchange="calc()">亮油</label>
+      <label><input type="radio" name="oilType" value="哑油" onchange="calc()">哑油</label>
+      <label><input type="radio" name="oilType" value="UV油" onchange="calc()" checked>UV油</label>
+    </div>
+    <label><input type="checkbox" data-key="emboss" onchange="toggleCheck(this);calc()">压纹</label>
+    <label><input type="checkbox" data-key="hotStamp" onchange="toggleCheck(this);calc()">烫金/银</label>
+    <label><input type="checkbox" data-key="window" onchange="toggleCheck(this);calc()">开窗贴片</label>
+    <label><input type="checkbox" data-key="mount" onchange="toggleCheck(this);calc()">裱瓦</label>
+  </div>
+</div>
+
+<!-- 6. 模切 & 糊盒 & 运费 -->
+<div class="card">
+  <h2>✂️ 模切 · 糊盒 · 运费</h2>
+  <div class="row">
+    <label>运费区域</label>
+    <select id="shipZone" onchange="calc()">
+      <option value="龙泉">龙泉 0.08元/个</option>
+      <option value="庆元/云和">庆元/云和 0.12元/个</option>
+      <option value="政和/景宁/松溪">政和/景宁/松溪 0.15元/个</option>
+      <option value="丽水">丽水 0.18元/个</option>
+      <option value="建瓯/松阳">建瓯/松阳 0.25元/个</option>
+    </select>
+  </div>
+  <div class="auto-info">
+    自动匹配模切机台：<span id="dieCutMachine">—</span>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;min-width:auto;">
+      <input type="checkbox" id="noDieFee" onchange="calc()" style="flex:none;min-width:auto;">
+      不算刀版费
+    </label>
+  </div>
+</div>
+
+<!-- 7. 数量 & 利润 -->
+<div class="card">
+  <h2>💰 报价</h2>
+  <div class="row">
+    <label>订单数量</label><input type="number" id="quantity" placeholder="个" step="1" oninput="calc()">
+    <span class="unit">个</span>
+    <label>利润点</label><input type="number" id="profit" value="15" step="1" oninput="calc()">
+    <span class="unit">%</span>
+  </div>
+</div>
+
+<!-- 结果 -->
+<div class="card result" id="resultCard">
+  <div class="label">📊 最终报价（单盒）</div>
+  <div class="big" id="finalPrice">—</div>
+  <div class="label" id="costBreakdown" style="margin-top:6px"></div>
+</div>
+
+<div class="card" id="detailCard" style="display:none">
+  <h2>📋 费用明细</h2>
+  <table id="detailTable"></table>
+</div>
+
+<div style="text-align:center;color:#bbb;font-size:12px;margin-top:10px">
+  彩盒计价器 v1.0 · Made with ❤️
+</div>
+
+<script>
+// ===== 数据 =====
+const printMachines = [
+  { name: '105对开', maxL: 104, maxW: 75,  c4base: 350,  c4rate: 0.07, c5base: 550,  c5rate: 0.11 },
+  { name: '142全开(115×85)', maxL: 115, maxW: 85,  c4base: 520,  c4rate: 0.11, c5base: 800,  c5rate: 0.14 },
+  { name: '142全开(132×97)', maxL: 132, maxW: 97,  c4base: 650,  c4rate: 0.16, c5base: 900,  c5rate: 0.22 },
+  { name: '142全开(145×104)', maxL: 145, maxW: 104, c4base: 750,  c4rate: 0.22, c5base: 1150, c5rate: 0.27 },
+];
+
+const dieCutMachines = [
+  { name: '930手动', maxL: 900, maxW: 640,  minFee: 35,  rate: 0.08 },
+  { name: '1100手动', maxL: 1070, maxW: 760,  minFee: 35,  rate: 0.1 },
+  { name: '1300自动', maxL: 1270, maxW: 970,  minFee: 40,  rate: 0.12 },
+  { name: '1500自动', maxL: 1470, maxW: 1070, minFee: 50,  rate: 0.2 },
+  { name: '1800手动', maxL: 1780, maxW: 1260, minFee: 50,  rate: 0.3 },
+];
+
+const shipFees = {
+  '龙泉': 0.08, '庆元/云和': 0.12, '政和/景宁/松溪': 0.15,
+  '丽水': 0.18, '建瓯/松阳': 0.25
+};
+
+const lamPrices = { '亮膜': 0.3, '哑膜': 0.35 };
+const oilPrices = { '亮油': 0.2, '哑油': 0.28, 'UV油': 0.45 };
+
+// ===== UI =====
+function toggleCheck(cb) {
+  const label = cb.parentElement;
+  label.classList.toggle('checked', cb.checked);
+  const sub = document.querySelector(`.sub-options[data-parent="${cb.dataset.key}"]`);
+  if (sub) sub.classList.toggle('show', cb.checked);
+}
+
+document.querySelectorAll('#finishingChecks .sub-options label').forEach(l => {
+  l.addEventListener('click', function() {
+    this.parentElement.querySelectorAll('label').forEach(s => s.classList.remove('sel'));
+    this.classList.add('sel');
+  });
+  // init
+  if (l.querySelector('input[type=radio]').checked) l.classList.add('sel');
+});
+
+// ===== 计算 =====
+function calc() {
+  const knifeL = parseFloat(document.getElementById('knifeL').value) || 0;
+  const knifeW = parseFloat(document.getElementById('knifeW').value) || 0;
+  const faceTon = parseFloat(document.getElementById('faceTon').value) || 0;
+  const faceGram = parseFloat(document.getElementById('faceGram').value) || 0;
+  const flutePrice = parseFloat(document.getElementById('flutePrice').value) || 0;
+  const colors = parseInt(document.getElementById('colorCount').value);
+  const quantity = parseInt(document.getElementById('quantity').value) || 0;
+  const profit = parseFloat(document.getElementById('profit').value) || 15;
+  const noDieFee = document.getElementById('noDieFee').checked;
+  const shipZone = document.getElementById('shipZone').value;
+
+  // 面纸/浪纸尺寸
+  const faceL = knifeL;
+  const faceW = knifeW + 20;
+  const fluteL = knifeL;
+  const fluteW = knifeW + 10;
+
+  // 面积 (㎡)
+  const faceArea = (faceL / 1000) * (faceW / 1000);
+  const fluteArea = (fluteL / 1000) * (fluteW / 1000);
+
+  // 显示尺寸
+  document.getElementById('faceSize').textContent = knifeL ? `${faceL.toFixed(1)} × ${faceW.toFixed(1)} mm` : '—';
+  document.getElementById('fluteSize').textContent = knifeL ? `${fluteL.toFixed(1)} × ${fluteW.toFixed(1)} mm` : '—';
+
+  // 匹配印刷机台
+  const faceLcm = faceL / 10;
+  const faceWcm = faceW / 10;
+  let printM = null;
+  for (const m of printMachines) {
+    if (faceLcm <= m.maxL && faceWcm <= m.maxW) { printM = m; break; }
+  }
+  document.getElementById('printMachine').textContent = printM ? printM.name : '超出最大机台范围';
+
+  // 匹配模切机台
+  let dieM = null;
+  for (const m of dieCutMachines) {
+    if (faceL <= m.maxL && faceW <= m.maxW) { dieM = m; break; }
+  }
+  document.getElementById('dieCutMachine').textContent = dieM ? dieM.name : '超出最大机台范围';
+
+  if (!knifeL || !knifeW || !quantity || !printM || !dieM) {
+    document.getElementById('finalPrice').textContent = '—';
+    document.getElementById('costBreakdown').textContent = '请填写完整参数';
+    document.getElementById('detailCard').style.display = 'none';
+    return;
+  }
+
+  // 面料成本
+  const facePerSheet = faceArea * faceGram * faceTon / 1000000;
+  const faceTotal = facePerSheet * quantity;
+
+  // 浪纸成本
+  const flutePerSheet = fluteArea * flutePrice;
+  const fluteTotal = flutePerSheet * quantity;
+
+  // 印刷费
+  const printBase = colors === 4 ? printM.c4base : printM.c5base;
+  const printRate = colors === 4 ? printM.c4rate : printM.c5rate;
+  let printFee;
+  if (quantity <= 3000) {
+    printFee = printBase;
+  } else {
+    printFee = printBase + (quantity - 3000) * printRate;
+  }
+
+  // 后道工序
+  let lamFee = 0, oilFee = 0, embossFee = 0, hotStampFee = 0, windowFee = 0, mountFee = 0;
+  let lamName = '', oilName = '', details = [];
+
+  if (document.querySelector('[data-key="laminate"]').checked) {
+    const lamType = document.querySelector('input[name="lamType"]:checked')?.value || '亮膜';
+    lamFee = faceArea * lamPrices[lamType] * quantity;
+    lamName = `覆膜(${lamType})`;
+  }
+  if (document.querySelector('[data-key="oil"]').checked) {
+    const oilType = document.querySelector('input[name="oilType"]:checked')?.value || 'UV油';
+    oilFee = faceArea * oilPrices[oilType] * quantity;
+    oilName = `上油(${oilType})`;
+  }
+  if (document.querySelector('[data-key="emboss"]').checked) {
+    embossFee = quantity * 0.15 + 100;
+  }
+  if (document.querySelector('[data-key="hotStamp"]').checked) {
+    hotStampFee = quantity * 0.3;
+  }
+  if (document.querySelector('[data-key="window"]').checked) {
+    windowFee = quantity * 0.06;
+  }
+  if (document.querySelector('[data-key="mount"]').checked) {
+    mountFee = faceArea * 0.2 * quantity;
+  }
+
+  // 模切费
+  const dieCutFee = Math.max(dieM.minFee, quantity * dieM.rate);
+
+  // 刀版费
+  const diePlateFee = noDieFee ? 0 : faceArea * 250;
+
+  // 糊盒费 (瓦楞盒)
+  const boxMaxDim = Math.max(knifeL, knifeW) / 10; // cm
+  let glueFee;
+  if (boxMaxDim <= 20) glueFee = 0.05;
+  else if (boxMaxDim <= 30) glueFee = 0.05;
+  else if (boxMaxDim <= 60) glueFee = 0.08;
+  else if (boxMaxDim <= 80) glueFee = 0.13;
+  else glueFee = 0.16;
+  const glueTotal = glueFee * quantity;
+
+  // 运费
+  const shipFee = shipFees[shipZone] || 0;
+  const shipTotal = shipFee * quantity;
+
+  // 汇总
+  const items = [
+    { name: '面纸材料', cost: faceTotal },
+    { name: '浪纸材料', cost: fluteTotal },
+    { name: '印刷费', cost: printFee },
+  ];
+  if (lamFee > 0) items.push({ name: lamName, cost: lamFee });
+  if (oilFee > 0) items.push({ name: oilName, cost: oilFee });
+  if (embossFee > 0) items.push({ name: '压纹', cost: embossFee });
+  if (hotStampFee > 0) items.push({ name: '烫金/银', cost: hotStampFee });
+  if (windowFee > 0) items.push({ name: '开窗贴片', cost: windowFee });
+  if (mountFee > 0) items.push({ name: '裱瓦', cost: mountFee });
+  items.push({ name: '模切费', cost: dieCutFee });
+  if (!noDieFee) items.push({ name: '刀版费', cost: diePlateFee });
+  items.push({ name: '糊盒费', cost: glueTotal });
+  items.push({ name: '运费', cost: shipTotal });
+
+  const totalCost = items.reduce((s, i) => s + i.cost, 0);
+  const perBoxCost = totalCost / quantity;
+  const finalPerBox = perBoxCost * (1 + profit / 100);
+
+  // 显示结果
+  document.getElementById('finalPrice').textContent = `¥ ${finalPerBox.toFixed(3)}`;
+  document.getElementById('costBreakdown').textContent =
+    `总成本 ¥${totalCost.toFixed(2)} | 单盒成本 ¥${perBoxCost.toFixed(3)} | 利润 ${profit}%`;
+
+  // 明细表
+  document.getElementById('detailCard').style.display = 'block';
+  let html = '<tr><th>项目</th><th style="text-align:right">金额（元）</th></tr>';
+  for (const item of items) {
+    html += `<tr><td>${item.name}</td><td style="text-align:right">${item.cost.toFixed(2)}</td></tr>`;
+  }
+  html += `<tr><td>合计</td><td style="text-align:right">${totalCost.toFixed(2)}</td></tr>`;
+  html += `<tr><td>单盒成本（÷${quantity}）</td><td style="text-align:right">${perBoxCost.toFixed(3)}</td></tr>`;
+  html += `<tr><td>最终报价（×${(1+profit/100).toFixed(2)}）</td><td style="text-align:right;font-size:16px;color:#e74c3c">¥${finalPerBox.toFixed(3)}</td></tr>`;
+  document.getElementById('detailTable').innerHTML = html;
+}
+</script>
+</body>
+</html>
