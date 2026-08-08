@@ -58,6 +58,17 @@
   }
   .checks label.checked { background: #e8f0fe; border-color: #1a73e8; color: #1a73e8; }
   .checks input[type=checkbox] { display: none; }
+  .checks input[type=radio] { display: none; }
+
+  .sub-pill {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 13px; cursor: pointer;
+    padding: 3px 10px; border-radius: 12px;
+    border: 1px solid #ddd; background: #fff;
+    user-select: none; margin-right: 4px;
+  }
+  .sub-pill input[type=radio] { display: none; }
+  .sub-pill.sel { background: #1a73e8; color: #fff; border-color: #1a73e8; }
 
   .sub-options { margin-left: 20px; margin-top: 4px; display: none; }
   .sub-options.show { display: flex; gap: 8px; }
@@ -100,13 +111,21 @@
 <div class="card">
   <h2>📐 刀版尺寸</h2>
   <div class="row">
-    <label>长</label><input type="number" id="knifeL" placeholder="mm" step="0.1" oninput="calc()">
-    <label>宽</label><input type="number" id="knifeW" placeholder="mm" step="0.1" oninput="calc()">
+    <label>长</label><input type="number" id="knifeL" placeholder="mm" step="0.1" oninput="updateSizes()">
+    <label>宽</label><input type="number" id="knifeW" placeholder="mm" step="0.1" oninput="updateSizes()">
     <span class="unit">mm</span>
   </div>
-  <div class="auto-info">
-    面纸尺寸：<span id="faceSize">—</span> &nbsp;|&nbsp;
-    浪纸尺寸：<span id="fluteSize">—</span>
+  <div class="row">
+    <label>拼数</label><input type="number" id="up" placeholder="必填" min="1" step="1" >
+    <span class="unit">拼（一个面纸出几个盒）</span>
+  </div>
+  <div class="row">
+    <label>抛量</label><input type="number" id="waste" value="180" min="0" step="1" >
+    <span class="unit">张（损耗预留）</span>
+  </div>
+  <div class="row">
+    <label>面纸尺寸</label><input type="text" id="faceSize" readonly placeholder="自动计算">
+    <label>浪纸尺寸</label><input type="text" id="fluteSize" readonly placeholder="自动计算">
   </div>
 </div>
 
@@ -114,28 +133,19 @@
 <div class="card">
   <h2>📄 面纸</h2>
   <div class="row">
-    <label>吨价</label><input type="number" id="faceTon" placeholder="元/吨" step="1" oninput="calc()">
+    <label>吨价</label><input type="number" id="faceTon" placeholder="元/吨" step="1" >
     <span class="unit">元/吨</span>
-    <label>克重</label><input type="number" id="faceGram" placeholder="g/㎡" step="1" oninput="calc()">
+    <label>克重</label><input type="number" id="faceGram" placeholder="g/㎡" step="1" >
     <span class="unit">g/㎡</span>
   </div>
 </div>
 
-<!-- 3. 浪纸 -->
-<div class="card">
-  <h2>📦 浪纸</h2>
-  <div class="row">
-    <label>平方单价</label><input type="number" id="flutePrice" placeholder="元/㎡" step="0.01" oninput="calc()">
-    <span class="unit">元/㎡</span>
-  </div>
-</div>
-
-<!-- 4. 印刷 -->
+<!-- 3. 印刷 -->
 <div class="card">
   <h2>🖨️ 印刷</h2>
   <div class="row">
     <label>色数</label>
-    <select id="colorCount" onchange="calc()">
+    <select id="colorCount" >
       <option value="4">4色</option>
       <option value="5">5色</option>
     </select>
@@ -143,34 +153,89 @@
   <div class="auto-info">自动匹配机台：<span id="printMachine">—</span></div>
 </div>
 
-<!-- 5. 后道工序 -->
+<!-- 4. 表面处理 -->
 <div class="card">
-  <h2>🔧 后道工序</h2>
-  <div class="checks" id="finishingChecks">
-    <label><input type="checkbox" data-key="laminate" onchange="toggleCheck(this);calc()">覆膜</label>
-    <div class="sub-options" data-parent="laminate">
-      <label><input type="radio" name="lamType" value="亮膜" onchange="calc()" checked>亮膜</label>
-      <label><input type="radio" name="lamType" value="哑膜" onchange="calc()">哑膜</label>
-    </div>
-    <label><input type="checkbox" data-key="oil" onchange="toggleCheck(this);calc()">上油</label>
-    <div class="sub-options" data-parent="oil">
-      <label><input type="radio" name="oilType" value="亮油" onchange="calc()">亮油</label>
-      <label><input type="radio" name="oilType" value="哑油" onchange="calc()">哑油</label>
-      <label><input type="radio" name="oilType" value="UV油" onchange="calc()" checked>UV油</label>
-    </div>
+  <h2>✨ 表面处理</h2>
+  <div style="margin-bottom:8px">
+    <span style="font-size:13px;color:#888;margin-right:6px">覆膜：</span>
+    <label><input type="checkbox" data-key="lamBright" onchange="toggleCheck(this);calc()">亮膜</label>
+    <label><input type="checkbox" data-key="lamMatte" onchange="toggleCheck(this);calc()">哑膜</label>
+  </div>
+  <div style="margin-bottom:10px">
+    <span style="font-size:13px;color:#888;margin-right:6px">上油：</span>
+    <label><input type="checkbox" data-key="oilBright" onchange="toggleCheck(this);calc()">亮油</label>
+    <label><input type="checkbox" data-key="oilMatte" onchange="toggleCheck(this);calc()">哑油</label>
+    <label><input type="checkbox" data-key="oilUV" onchange="toggleCheck(this);calc()">UV油</label>
+  </div>
+  <div class="checks">
     <label><input type="checkbox" data-key="emboss" onchange="toggleCheck(this);calc()">压纹</label>
     <label><input type="checkbox" data-key="hotStamp" onchange="toggleCheck(this);calc()">烫金/银</label>
     <label><input type="checkbox" data-key="window" onchange="toggleCheck(this);calc()">开窗贴片</label>
-    <label><input type="checkbox" data-key="mount" onchange="toggleCheck(this);calc()">裱瓦</label>
   </div>
 </div>
 
-<!-- 6. 模切 & 糊盒 & 运费 -->
+<!-- 5. 浪纸 -->
 <div class="card">
-  <h2>✂️ 模切 · 糊盒 · 运费</h2>
+  <h2>📦 浪纸</h2>
   <div class="row">
-    <label>运费区域</label>
-    <select id="shipZone" onchange="calc()">
+    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;min-width:auto;">
+      <input type="checkbox" id="hasFlute" checked onchange="toggleFlute()" style="flex:none;min-width:auto;">
+      有浪纸
+    </label>
+  </div>
+  <div class="row" id="fluteRow">
+    <label>平方单价</label><input type="number" id="flutePrice" placeholder="元/㎡" step="0.01" >
+    <span class="unit">元/㎡</span>
+  </div>
+  <div class="row">
+    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;min-width:auto;">
+      <input type="checkbox" id="mountCheck" checked  style="flex:none;min-width:auto;">
+      裱瓦 0.2元/㎡
+    </label>
+  </div>
+</div>
+
+<!-- 6. 模切 -->
+<div class="card">
+  <h2>✂️ 模切</h2>
+  <div class="row">
+    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;min-width:auto;">
+      <input type="checkbox" id="hasDieCut" checked onchange="calc()" style="flex:none;min-width:auto;">
+      包含模切
+    </label>
+  </div>
+  <div class="auto-info">自动匹配机台：<span id="dieCutMachine">—</span></div>
+  <div class="row" style="margin-top:6px">
+    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;min-width:auto;">
+      <input type="checkbox" id="noDieFee" style="flex:none;min-width:auto;">
+      不算刀版费
+    </label>
+  </div>
+</div>
+
+<!-- 7. 糊盒 -->
+<div class="card">
+  <h2>📐 糊盒</h2>
+  <div class="row">
+    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;min-width:auto;">
+      <input type="checkbox" id="hasGlue" checked onchange="calc()" style="flex:none;min-width:auto;">
+      包含糊盒（瓦楞盒）
+    </label>
+  </div>
+</div>
+
+<!-- 8. 运费 -->
+<div class="card">
+  <h2>🚚 运费</h2>
+  <div class="row">
+    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;min-width:auto;">
+      <input type="checkbox" id="hasShip" checked onchange="calc()" style="flex:none;min-width:auto;">
+      包含运费
+    </label>
+  </div>
+  <div class="row">
+    <label>区域</label>
+    <select id="shipZone">
       <option value="龙泉">龙泉 0.08元/个</option>
       <option value="庆元/云和">庆元/云和 0.12元/个</option>
       <option value="政和/景宁/松溪">政和/景宁/松溪 0.15元/个</option>
@@ -178,26 +243,30 @@
       <option value="建瓯/松阳">建瓯/松阳 0.25元/个</option>
     </select>
   </div>
-  <div class="auto-info">
-    自动匹配模切机台：<span id="dieCutMachine">—</span>
-  </div>
-  <div class="row" style="margin-top:8px">
-    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;min-width:auto;">
-      <input type="checkbox" id="noDieFee" onchange="calc()" style="flex:none;min-width:auto;">
-      不算刀版费
-    </label>
-  </div>
 </div>
 
-<!-- 7. 数量 & 利润 -->
+<!-- 9. 数量 & 利润 -->
 <div class="card">
   <h2>💰 报价</h2>
   <div class="row">
-    <label>订单数量</label><input type="number" id="quantity" placeholder="个" step="1" oninput="calc()">
+    <label>订单数量</label><input type="number" id="quantity" placeholder="个" step="1" >
     <span class="unit">个</span>
-    <label>利润点</label><input type="number" id="profit" value="15" step="1" oninput="calc()">
+    <label>利润点</label><input type="number" id="profit" value="15" step="1" >
     <span class="unit">%</span>
   </div>
+</div>
+
+<!-- 计算按钮 -->
+<div class="card" style="text-align:center;padding:16px">
+  <button onclick="calc()" style="
+    padding:14px 80px;font-size:17px;font-weight:bold;
+    background:linear-gradient(135deg,#1a73e8,#0d47a1);
+    color:#fff;border:none;border-radius:10px;
+    cursor:pointer;box-shadow:0 4px 14px rgba(26,115,232,0.35);
+    transition:all 0.2s;
+  " onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(26,115,232,0.45)'"
+     onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(26,115,232,0.35)'"
+  >📊 开始计算</button>
 </div>
 
 <!-- 结果 -->
@@ -242,6 +311,36 @@ const lamPrices = { '亮膜': 0.3, '哑膜': 0.35 };
 const oilPrices = { '亮油': 0.2, '哑油': 0.28, 'UV油': 0.45 };
 
 // ===== UI =====
+function updateSizes() {
+  const knifeL = parseFloat(document.getElementById('knifeL').value) || 0;
+  const knifeW = parseFloat(document.getElementById('knifeW').value) || 0;
+  const hasFlute = document.getElementById('hasFlute').checked;
+  const faceL = knifeL + 20, faceW = knifeW + 20;
+  const fluteL = knifeL + 10, fluteW = knifeW + 10;
+  document.getElementById('faceSize').value = knifeL ? `${faceL.toFixed(1)} × ${faceW.toFixed(1)} mm` : '';
+  document.getElementById('fluteSize').value = (knifeL && hasFlute) ? `${fluteL.toFixed(1)} × ${fluteW.toFixed(1)} mm` : '无浪纸';
+  
+  // 匹配机台
+  const fLcm = faceL / 10, fWcm = faceW / 10;
+  let pm = null, dm = null;
+  for (const m of printMachines) { if (fLcm <= m.maxL && fWcm <= m.maxW) { pm = m; break; } }
+  for (const m of dieCutMachines) { if (faceL <= m.maxL && faceW <= m.maxW) { dm = m; break; } }
+  document.getElementById('printMachine').textContent = pm ? pm.name : '—';
+  document.getElementById('dieCutMachine').textContent = dm ? dm.name : '—';
+}
+
+function toggleFlute() {
+  const has = document.getElementById('hasFlute').checked;
+  document.getElementById('fluteRow').style.display = has ? '' : 'none';
+  if (!has) {
+    document.getElementById('flutePrice').value = '';
+    document.getElementById('mountCheck').checked = false;
+  } else {
+    document.getElementById('mountCheck').checked = true;
+  }
+  updateSizes();
+}
+
 function toggleCheck(cb) {
   const label = cb.parentElement;
   label.classList.toggle('checked', cb.checked);
@@ -249,13 +348,37 @@ function toggleCheck(cb) {
   if (sub) sub.classList.toggle('show', cb.checked);
 }
 
-document.querySelectorAll('#finishingChecks .sub-options label').forEach(l => {
-  l.addEventListener('click', function() {
-    this.parentElement.querySelectorAll('label').forEach(s => s.classList.remove('sel'));
-    this.classList.add('sel');
+// init checked checkboxes on load
+document.querySelectorAll('#finishingChecks input[type=checkbox], .checks input[type=checkbox]').forEach(cb => {
+  if (cb.checked) cb.parentElement.classList.add('checked');
+});
+
+// radio button visual states
+document.querySelectorAll('.checks input[type=radio]').forEach(r => {
+  r.addEventListener('click', function(e) {
+    if (this._wasChecked) {
+      this.checked = false;
+      this._wasChecked = false;
+      calc();
+      return;
+    }
   });
-  // init
-  if (l.querySelector('input[type=radio]').checked) l.classList.add('sel');
+  r.addEventListener('change', function() {
+    this.closest('.checks').querySelectorAll('label').forEach(l => l.classList.remove('checked'));
+    if (this.checked) this.parentElement.classList.add('checked');
+    // track state
+    document.querySelectorAll(`input[name="${this.name}"]`).forEach(s => s._wasChecked = (s === this && s.checked));
+  });
+  if (r.checked) { r.parentElement.classList.add('checked'); r._wasChecked = true; }
+});
+
+document.querySelectorAll('.sub-pill input[type=radio]').forEach(r => {
+  r.addEventListener('change', function() {
+    const name = this.name;
+    document.querySelectorAll(`input[name="${name}"]`).forEach(s => s.parentElement.classList.remove('sel'));
+    if (this.checked) this.parentElement.classList.add('sel');
+  });
+  if (r.checked) r.parentElement.classList.add('sel');
 });
 
 // ===== 计算 =====
@@ -267,14 +390,24 @@ function calc() {
   const flutePrice = parseFloat(document.getElementById('flutePrice').value) || 0;
   const colors = parseInt(document.getElementById('colorCount').value);
   const quantity = parseInt(document.getElementById('quantity').value) || 0;
+  const up = parseInt(document.getElementById('up').value) || 0;
+  const waste = parseInt(document.getElementById('waste').value) || 0;
   const profit = parseFloat(document.getElementById('profit').value) || 15;
   const noDieFee = document.getElementById('noDieFee').checked;
+  const hasFlute = document.getElementById('hasFlute').checked;
+  const hasDieCut = document.getElementById('hasDieCut').checked;
+  const hasGlue = document.getElementById('hasGlue').checked;
+  const hasShip = document.getElementById('hasShip').checked;
   const shipZone = document.getElementById('shipZone').value;
 
+  // 拼数：一个面纸出几个盒
+  const sheets = Math.ceil(quantity / up);
+  const totalSheets = sheets + waste;
+
   // 面纸/浪纸尺寸
-  const faceL = knifeL;
+  const faceL = knifeL + 20;
   const faceW = knifeW + 20;
-  const fluteL = knifeL;
+  const fluteL = knifeL + 10;
   const fluteW = knifeW + 10;
 
   // 面积 (㎡)
@@ -282,8 +415,8 @@ function calc() {
   const fluteArea = (fluteL / 1000) * (fluteW / 1000);
 
   // 显示尺寸
-  document.getElementById('faceSize').textContent = knifeL ? `${faceL.toFixed(1)} × ${faceW.toFixed(1)} mm` : '—';
-  document.getElementById('fluteSize').textContent = knifeL ? `${fluteL.toFixed(1)} × ${fluteW.toFixed(1)} mm` : '—';
+  document.getElementById('faceSize').value = knifeL ? `${faceL.toFixed(1)} × ${faceW.toFixed(1)} mm` : '';
+  document.getElementById('fluteSize').value = (knifeL && hasFlute) ? `${fluteL.toFixed(1)} × ${fluteW.toFixed(1)} mm` : '无浪纸';
 
   // 匹配印刷机台
   const faceLcm = faceL / 10;
@@ -301,47 +434,51 @@ function calc() {
   }
   document.getElementById('dieCutMachine').textContent = dieM ? dieM.name : '超出最大机台范围';
 
-  if (!knifeL || !knifeW || !quantity || !printM || !dieM) {
+  if (!knifeL || !knifeW || !quantity || !up || !printM || (hasDieCut && !dieM)) {
     document.getElementById('finalPrice').textContent = '—';
     document.getElementById('costBreakdown').textContent = '请填写完整参数';
     document.getElementById('detailCard').style.display = 'none';
     return;
   }
 
-  // 面料成本
+  // 面料成本（含抛量）
   const facePerSheet = faceArea * faceGram * faceTon / 1000000;
-  const faceTotal = facePerSheet * quantity;
+  const faceTotal = facePerSheet * totalSheets;
 
-  // 浪纸成本
-  const flutePerSheet = fluteArea * flutePrice;
-  const fluteTotal = flutePerSheet * quantity;
+  // 浪纸成本（含抛量）
+  const flutePerSheet = hasFlute ? fluteArea * flutePrice : 0;
+  const fluteTotal = flutePerSheet * totalSheets;
 
-  // 印刷费
+  // 印刷费（按总张数，含抛量）
   const printBase = colors === 4 ? printM.c4base : printM.c5base;
   const printRate = colors === 4 ? printM.c4rate : printM.c5rate;
   let printFee;
-  if (quantity <= 3000) {
+  if (totalSheets <= 3000) {
     printFee = printBase;
   } else {
-    printFee = printBase + (quantity - 3000) * printRate;
+    printFee = printBase + (totalSheets - 3000) * printRate;
   }
 
   // 后道工序
   let lamFee = 0, oilFee = 0, embossFee = 0, hotStampFee = 0, windowFee = 0, mountFee = 0;
-  let lamName = '', oilName = '', details = [];
 
-  if (document.querySelector('[data-key="laminate"]').checked) {
-    const lamType = document.querySelector('input[name="lamType"]:checked')?.value || '亮膜';
-    lamFee = faceArea * lamPrices[lamType] * quantity;
-    lamName = `覆膜(${lamType})`;
+  if (document.querySelector('[data-key="lamBright"]').checked) {
+    lamFee += faceArea * lamPrices['亮膜'] * totalSheets;
   }
-  if (document.querySelector('[data-key="oil"]').checked) {
-    const oilType = document.querySelector('input[name="oilType"]:checked')?.value || 'UV油';
-    oilFee = faceArea * oilPrices[oilType] * quantity;
-    oilName = `上油(${oilType})`;
+  if (document.querySelector('[data-key="lamMatte"]').checked) {
+    lamFee += faceArea * lamPrices['哑膜'] * totalSheets;
+  }
+  if (document.querySelector('[data-key="oilBright"]').checked) {
+    oilFee += faceArea * oilPrices['亮油'] * totalSheets;
+  }
+  if (document.querySelector('[data-key="oilMatte"]').checked) {
+    oilFee += faceArea * oilPrices['哑油'] * totalSheets;
+  }
+  if (document.querySelector('[data-key="oilUV"]').checked) {
+    oilFee += faceArea * oilPrices['UV油'] * totalSheets;
   }
   if (document.querySelector('[data-key="emboss"]').checked) {
-    embossFee = quantity * 0.15 + 100;
+    embossFee = totalSheets * 0.15 + 100;
   }
   if (document.querySelector('[data-key="hotStamp"]').checked) {
     hotStampFee = quantity * 0.3;
@@ -349,46 +486,68 @@ function calc() {
   if (document.querySelector('[data-key="window"]').checked) {
     windowFee = quantity * 0.06;
   }
-  if (document.querySelector('[data-key="mount"]').checked) {
-    mountFee = faceArea * 0.2 * quantity;
+  if (document.getElementById('mountCheck').checked) {
+    mountFee = faceArea * 0.2 * totalSheets;
   }
 
-  // 模切费
-  const dieCutFee = Math.max(dieM.minFee, quantity * dieM.rate);
+  // 模切费（含抛量）
+  const dieCutFee = hasDieCut ? Math.max(dieM.minFee, totalSheets * dieM.rate) : 0;
 
   // 刀版费
-  const diePlateFee = noDieFee ? 0 : faceArea * 250;
+  const diePlateFee = (noDieFee || !hasDieCut) ? 0 : faceArea * 250;
 
   // 糊盒费 (瓦楞盒)
-  const boxMaxDim = Math.max(knifeL, knifeW) / 10; // cm
-  let glueFee;
-  if (boxMaxDim <= 20) glueFee = 0.05;
-  else if (boxMaxDim <= 30) glueFee = 0.05;
-  else if (boxMaxDim <= 60) glueFee = 0.08;
-  else if (boxMaxDim <= 80) glueFee = 0.13;
-  else glueFee = 0.16;
-  const glueTotal = glueFee * quantity;
+  let glueFee = 0, glueTotal = 0;
+  if (hasGlue) {
+    const boxMaxDim = Math.max(knifeL, knifeW) / 10;
+    if (boxMaxDim <= 20) glueFee = 0.05;
+    else if (boxMaxDim <= 30) glueFee = 0.05;
+    else if (boxMaxDim <= 60) glueFee = 0.08;
+    else if (boxMaxDim <= 80) glueFee = 0.13;
+    else glueFee = 0.16;
+    glueTotal = glueFee * quantity;
+  }
 
   // 运费
-  const shipFee = shipFees[shipZone] || 0;
+  const shipFee = hasShip ? (shipFees[shipZone] || 0) : 0;
   const shipTotal = shipFee * quantity;
 
   // 汇总
   const items = [
-    { name: '面纸材料', cost: faceTotal },
-    { name: '浪纸材料', cost: fluteTotal },
-    { name: '印刷费', cost: printFee },
+    { name: '面纸材料', cost: faceTotal, formula: `${faceArea.toFixed(4)}m² × ${faceGram}g × ${faceTon}元/吨 ÷ 10⁶ × ${totalSheets}张` },
   ];
-  if (lamFee > 0) items.push({ name: lamName, cost: lamFee });
-  if (oilFee > 0) items.push({ name: oilName, cost: oilFee });
-  if (embossFee > 0) items.push({ name: '压纹', cost: embossFee });
-  if (hotStampFee > 0) items.push({ name: '烫金/银', cost: hotStampFee });
-  if (windowFee > 0) items.push({ name: '开窗贴片', cost: windowFee });
-  if (mountFee > 0) items.push({ name: '裱瓦', cost: mountFee });
-  items.push({ name: '模切费', cost: dieCutFee });
-  if (!noDieFee) items.push({ name: '刀版费', cost: diePlateFee });
-  items.push({ name: '糊盒费', cost: glueTotal });
-  items.push({ name: '运费', cost: shipTotal });
+  if (hasFlute) items.push({ name: '浪纸材料', cost: fluteTotal, formula: `${fluteArea.toFixed(4)}m² × ${flutePrice}元/m² × ${totalSheets}张` });
+  
+  if (totalSheets <= 3000) {
+    items.push({ name: '印刷费', cost: printFee, formula: `${colors}色 ${printM.name} 底价` });
+  } else {
+    items.push({ name: '印刷费', cost: printFee, formula: `${printBase} + (${totalSheets}−3000) × ${printRate}` });
+  }
+  
+  if (lamFee > 0) {
+    const parts = [];
+    if (document.querySelector('[data-key="lamBright"]').checked) parts.push(`亮膜`);
+    if (document.querySelector('[data-key="lamMatte"]').checked) parts.push(`哑膜`);
+    items.push({ name: '覆膜', cost: lamFee, formula: `${faceArea.toFixed(4)}m² × ${parts.join('+')} × ${totalSheets}张` });
+  }
+  if (oilFee > 0) {
+    const parts = [];
+    if (document.querySelector('[data-key="oilBright"]').checked) parts.push(`亮油`);
+    if (document.querySelector('[data-key="oilMatte"]').checked) parts.push(`哑油`);
+    if (document.querySelector('[data-key="oilUV"]').checked) parts.push(`UV油`);
+    items.push({ name: '上油', cost: oilFee, formula: `${faceArea.toFixed(4)}m² × ${parts.join('+')} × ${totalSheets}张` });
+  }
+  if (embossFee > 0) items.push({ name: '压纹', cost: embossFee, formula: `${totalSheets}张 × 0.15 + 100上机费` });
+  if (hotStampFee > 0) items.push({ name: '烫金/银', cost: hotStampFee, formula: `${quantity}个 × 0.3` });
+  if (windowFee > 0) items.push({ name: '开窗贴片', cost: windowFee, formula: `${quantity}个 × 0.06` });
+  if (mountFee > 0) items.push({ name: '裱瓦', cost: mountFee, formula: `${faceArea.toFixed(4)}m² × 0.2 × ${totalSheets}张` });
+  
+  if (hasDieCut) {
+    items.push({ name: '模切费', cost: dieCutFee, formula: `max(${dieM.minFee}, ${totalSheets}×${dieM.rate}) ${dieM.name}` });
+    if (!noDieFee) items.push({ name: '刀版费', cost: diePlateFee, formula: `${faceArea.toFixed(4)}m² × 250` });
+  }
+  if (hasGlue) items.push({ name: '糊盒费', cost: glueTotal, formula: `${quantity}个 × ${glueFee} (瓦楞${(Math.max(knifeL,knifeW)/10).toFixed(0)}cm档)` });
+  if (hasShip) items.push({ name: '运费', cost: shipTotal, formula: `${quantity}个 × ${shipFee}` });
 
   const totalCost = items.reduce((s, i) => s + i.cost, 0);
   const perBoxCost = totalCost / quantity;
@@ -401,13 +560,13 @@ function calc() {
 
   // 明细表
   document.getElementById('detailCard').style.display = 'block';
-  let html = '<tr><th>项目</th><th style="text-align:right">金额（元）</th></tr>';
+  let html = '<tr><th>项目</th><th>计算方式</th><th style="text-align:right">单盒（元）</th></tr>';
   for (const item of items) {
-    html += `<tr><td>${item.name}</td><td style="text-align:right">${item.cost.toFixed(2)}</td></tr>`;
+    const perBox = item.cost / quantity;
+    html += `<tr><td>${item.name}</td><td style="font-size:12px;color:#888">${item.formula || ''}</td><td style="text-align:right">${perBox.toFixed(4)}</td></tr>`;
   }
-  html += `<tr><td>合计</td><td style="text-align:right">${totalCost.toFixed(2)}</td></tr>`;
-  html += `<tr><td>单盒成本（÷${quantity}）</td><td style="text-align:right">${perBoxCost.toFixed(3)}</td></tr>`;
-  html += `<tr><td>最终报价（×${(1+profit/100).toFixed(2)}）</td><td style="text-align:right;font-size:16px;color:#e74c3c">¥${finalPerBox.toFixed(3)}</td></tr>`;
+  html += `<tr style="font-weight:bold"><td>单盒成本合计</td><td></td><td style="text-align:right">${perBoxCost.toFixed(4)}</td></tr>`;
+  html += `<tr><td>最终报价（×${(1+profit/100).toFixed(2)}）</td><td>利润 ${profit}%</td><td style="text-align:right;font-size:16px;color:#e74c3c">¥${finalPerBox.toFixed(3)}</td></tr>`;
   document.getElementById('detailTable').innerHTML = html;
 }
 </script>
