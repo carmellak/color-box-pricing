@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a73e8">
 <title>彩盒计价器</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -568,6 +570,11 @@ function calc() {
   html += `<tr style="font-weight:bold"><td>单盒成本合计</td><td></td><td style="text-align:right">${perBoxCost.toFixed(4)}</td></tr>`;
   html += `<tr><td>最终报价（×${(1+profit/100).toFixed(2)}）</td><td>利润 ${profit}%</td><td style="text-align:right;font-size:16px;color:#e74c3c">¥${finalPerBox.toFixed(3)}</td></tr>`;
   document.getElementById('detailTable').innerHTML = html;
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
 }
 </script>
 </body>
