@@ -288,7 +288,7 @@ function updateSizes() {
   const faceL = knifeL + 20, faceW = knifeW + 20;
   const fluteL = knifeL + 10, fluteW = knifeW + 10;
   document.getElementById('faceSize').value = knifeL ? `${faceL.toFixed(1)} × ${faceW.toFixed(1)} mm` : '';
-  document.getElementById('fluteSize').value = (knifeL && hasFlute) ? `${fluteL.toFixed(1)} × ${fluteW.toFixed(1)} mm` : '无浪纸';
+  document.getElementById('fluteSize').value = !hasFlute ? '无浪纸' : (knifeL ? `${fluteL.toFixed(1)} × ${fluteW.toFixed(1)} mm` : '');
   
   // 匹配机台
   const fLcm = faceL / 10, fWcm = faceW / 10;
@@ -386,7 +386,7 @@ function calc() {
 
   // 显示尺寸
   document.getElementById('faceSize').value = knifeL ? `${faceL.toFixed(1)} × ${faceW.toFixed(1)} mm` : '';
-  document.getElementById('fluteSize').value = (knifeL && hasFlute) ? `${fluteL.toFixed(1)} × ${fluteW.toFixed(1)} mm` : '无浪纸';
+  document.getElementById('fluteSize').value = !hasFlute ? '无浪纸' : (knifeL ? `${fluteL.toFixed(1)} × ${fluteW.toFixed(1)} mm` : '');
 
   // 匹配印刷机台
   const faceLcm = faceL / 10;
