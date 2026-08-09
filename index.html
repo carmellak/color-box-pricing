@@ -90,6 +90,7 @@
   .result .label { font-size: 13px; opacity: 0.85; }
 
   table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  table.collapsed { display: none; }
   table td, table th {
     padding: 8px 10px; font-size: 13px; text-align: left;
     border-bottom: 1px solid #eee;
@@ -279,7 +280,7 @@
 </div>
 
 <div class="card" id="detailCard" style="display:none">
-  <h2>📋 费用明细</h2>
+  <h2 style="cursor:pointer" onclick="document.getElementById('detailTable').classList.toggle('collapsed')">📋 费用明细 <span style="font-size:12px;color:#999">(点击展开/收起)</span></h2>
   <table id="detailTable"></table>
 </div>
 
