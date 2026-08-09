@@ -14,47 +14,48 @@
     color: #333;
     max-width: 800px;
     margin: 0 auto;
-    padding: 16px;
+    padding: 10px 12px;
+    font-size: 14px;
   }
-  h1 { text-align: center; font-size: 22px; margin: 10px 0 20px; color: #1a73e8; }
+  h1 { text-align: center; font-size: 18px; margin: 6px 0 12px; color: #1a73e8; }
   
   .card {
     background: #fff;
-    border-radius: 10px;
-    padding: 16px;
-    margin-bottom: 12px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   }
   .card h2 {
-    font-size: 16px;
+    font-size: 14px;
     color: #555;
-    border-bottom: 2px solid #1a73e8;
-    padding-bottom: 6px;
-    margin-bottom: 12px;
+    border-bottom: 1.5px solid #1a73e8;
+    padding-bottom: 4px;
+    margin-bottom: 8px;
   }
 
-  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
-  .row label { min-width: 70px; font-size: 14px; color: #666; }
+  .row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
+  .row label { min-width: 50px; font-size: 13px; color: #666; }
   .row input, .row select {
-    padding: 7px 10px;
+    padding: 5px 8px;
     border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 14px;
+    border-radius: 5px;
+    font-size: 13px;
     flex: 1;
-    min-width: 80px;
+    min-width: 60px;
   }
   .row input:focus, .row select:focus {
     border-color: #1a73e8;
     outline: none;
-    box-shadow: 0 0 0 2px rgba(26,115,232,0.15);
+    box-shadow: 0 0 0 2px rgba(26,115,232,0.12);
   }
-  .unit { font-size: 13px; color: #999; white-space: nowrap; }
+  .unit { font-size: 12px; color: #999; white-space: nowrap; }
 
-  .checks { display: flex; flex-wrap: wrap; gap: 8px; }
+  .checks { display: flex; flex-wrap: wrap; gap: 5px; }
   .checks label {
-    display: flex; align-items: center; gap: 4px;
-    font-size: 14px; cursor: pointer;
-    padding: 4px 10px; border-radius: 16px;
+    display: flex; align-items: center; gap: 3px;
+    font-size: 12px; cursor: pointer;
+    padding: 3px 8px; border-radius: 12px;
     border: 1px solid #ddd; background: #fafafa;
     user-select: none;
   }
@@ -132,31 +133,26 @@
   </div>
 </div>
 
-<!-- 2. 面纸 -->
+<!-- 2. 面纸 & 印刷 -->
 <div class="card">
-  <h2>📄 面纸</h2>
+  <h2>📄 面纸 & 印刷</h2>
   <div class="row">
     <label>吨价</label><input type="number" id="faceTon" placeholder="元/吨" step="1" >
     <span class="unit">元/吨</span>
     <label>克重</label><input type="number" id="faceGram" placeholder="g/㎡" step="1" >
     <span class="unit">g/㎡</span>
   </div>
-</div>
-
-<!-- 3. 印刷 -->
-<div class="card">
-  <h2>🖨️ 印刷</h2>
   <div class="row">
     <label>色数</label>
     <select id="colorCount" >
       <option value="4">4色</option>
       <option value="5">5色</option>
     </select>
+    <span class="auto-info" style="font-size:12px">机台：<span id="printMachine">—</span></span>
   </div>
-  <div class="auto-info">自动匹配机台：<span id="printMachine">—</span></div>
 </div>
 
-<!-- 4. 表面处理 -->
+<!-- 3. 表面处理 -->
 <div class="card">
   <h2>✨ 表面处理</h2>
   <div style="margin-bottom:8px">
@@ -198,57 +194,36 @@
   </div>
 </div>
 
-<!-- 6. 模切 -->
+<!-- 5. 模切 · 糊盒 · 运费 -->
 <div class="card">
-  <h2>✂️ 模切</h2>
+  <h2>✂️ 模切 · 糊盒 · 运费</h2>
   <div class="row">
-    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;min-width:auto;">
-      <input type="checkbox" id="hasDieCut" checked onchange="calc()" style="flex:none;min-width:auto;">
-      包含模切
+    <label style="display:flex;align-items:center;gap:3px;cursor:pointer;min-width:auto;font-size:12px">
+      <input type="checkbox" id="hasDieCut" checked onchange="calc()" style="flex:none;min-width:auto;"> 模切
     </label>
-  </div>
-  <div class="auto-info">自动匹配机台：<span id="dieCutMachine">—</span></div>
-  <div class="row" style="margin-top:6px">
-    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;min-width:auto;">
-      <input type="checkbox" id="noDieFee" style="flex:none;min-width:auto;">
-      不算刀版费
+    <label style="display:flex;align-items:center;gap:3px;cursor:pointer;min-width:auto;font-size:12px">
+      <input type="checkbox" id="noDieFee" style="flex:none;min-width:auto;"> 不含刀版
     </label>
-  </div>
-</div>
-
-<!-- 7. 糊盒 -->
-<div class="card">
-  <h2>📐 糊盒</h2>
-  <div class="row">
-    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;min-width:auto;">
-      <input type="checkbox" id="hasGlue" checked onchange="calc()" style="flex:none;min-width:auto;">
-      包含糊盒（瓦楞盒）
+    <label style="display:flex;align-items:center;gap:3px;cursor:pointer;min-width:auto;font-size:12px">
+      <input type="checkbox" id="hasGlue" checked onchange="calc()" style="flex:none;min-width:auto;"> 糊盒
     </label>
-  </div>
-</div>
-
-<!-- 8. 运费 -->
-<div class="card">
-  <h2>🚚 运费</h2>
-  <div class="row">
-    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;min-width:auto;">
-      <input type="checkbox" id="hasShip" checked onchange="calc()" style="flex:none;min-width:auto;">
-      包含运费
+    <label style="display:flex;align-items:center;gap:3px;cursor:pointer;min-width:auto;font-size:12px">
+      <input type="checkbox" id="hasShip" checked onchange="calc()" style="flex:none;min-width:auto;"> 运费
     </label>
   </div>
   <div class="row">
-    <label>区域</label>
-    <select id="shipZone">
-      <option value="龙泉">龙泉 0.08元/个</option>
-      <option value="庆元/云和">庆元/云和 0.12元/个</option>
-      <option value="政和/景宁/松溪">政和/景宁/松溪 0.15元/个</option>
-      <option value="丽水">丽水 0.18元/个</option>
-      <option value="建瓯/松阳">建瓯/松阳 0.25元/个</option>
+    <select id="shipZone" style="flex:1">
+      <option value="龙泉">龙泉 0.08</option>
+      <option value="庆元/云和">庆元/云和 0.12</option>
+      <option value="政和/景宁/松溪">政和/景宁/松溪 0.15</option>
+      <option value="丽水">丽水 0.18</option>
+      <option value="建瓯/松阳">建瓯/松阳 0.25</option>
     </select>
+    <span class="auto-info" style="font-size:12px">模切机台：<span id="dieCutMachine">—</span></span>
   </div>
 </div>
 
-<!-- 9. 数量 & 利润 -->
+<!-- 6. 数量 & 利润 -->
 <div class="card">
   <h2>💰 报价</h2>
   <div class="row">
