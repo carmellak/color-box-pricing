@@ -197,9 +197,11 @@
   <h2>✂️ 模切 · 糊盒 · 运费</h2>
   <div class="checks">
     <label><input type="checkbox" id="hasDieCut" checked onchange="toggleCheck(this);calc()">模切</label>
-    <label><input type="checkbox" id="noDieFee" onchange="toggleCheck(this);calc()">不算刀版费</label>
     <label><input type="checkbox" id="hasGlue" checked onchange="toggleCheck(this);calc()">糊盒</label>
     <label><input type="checkbox" id="hasShip" checked onchange="toggleCheck(this);calc()">运费</label>
+  </div>
+  <div class="checks" style="margin-top:4px">
+    <label><input type="checkbox" id="noDieFee" onchange="toggleCheck(this);calc()">不算刀版费</label>
   </div>
   <div class="row">
     <select id="shipZone" style="flex:1">
