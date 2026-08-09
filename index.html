@@ -15,9 +15,9 @@
     max-width: 800px;
     margin: 0 auto;
     padding: 10px 12px;
-    font-size: 28px;
+    font-size: 21px;
   }
-  h1 { text-align: center; font-size: 36px; margin: 6px 0 12px; color: #1a73e8; }
+  h1 { text-align: center; font-size: 27px; margin: 6px 0 12px; color: #1a73e8; }
   
   .card {
     background: #fff;
@@ -27,7 +27,7 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   }
   .card h2 {
-    font-size: 28px;
+    font-size: 21px;
     color: #555;
     border-bottom: 1.5px solid #1a73e8;
     padding-bottom: 4px;
@@ -35,12 +35,12 @@
   }
 
   .row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
-  .row label { min-width: 50px; font-size: 26px; color: #666; }
+  .row label { min-width: 50px; font-size: 20px; color: #666; }
   .row input, .row select {
     padding: 3px 6px;
     border: 1px solid #ddd;
     border-radius: 5px;
-    font-size: 26px;
+    font-size: 20px;
     flex: 1.5;
     min-width: 50px;
   }
@@ -49,12 +49,12 @@
     outline: none;
     box-shadow: 0 0 0 2px rgba(26,115,232,0.12);
   }
-  .unit { font-size: 24px; color: #999; white-space: nowrap; }
+  .unit { font-size: 18px; color: #999; white-space: nowrap; }
 
   .checks { display: flex; flex-wrap: wrap; gap: 5px; }
   .checks label {
     display: flex; align-items: center; gap: 3px;
-    font-size: 24px; cursor: pointer;
+    font-size: 18px; cursor: pointer;
     padding: 3px 8px; border-radius: 12px;
     border: 1px solid #ddd; background: #fafafa;
     user-select: none;
@@ -87,18 +87,18 @@
     color: #fff; border-radius: 10px; padding: 20px;
     text-align: center;
   }
-  .result .big { font-size: 64px; font-weight: bold; margin: 8px 0; }
-  .result .label { font-size: 26px; opacity: 0.85; }
+  .result .big { font-size: 48px; font-weight: bold; margin: 8px 0; }
+  .result .label { font-size: 20px; opacity: 0.85; }
 
   table { width: 100%; border-collapse: collapse; margin-top: 10px; }
   table.collapsed { display: none; }
   table td, table th {
-    padding: 8px 10px; font-size: 26px; text-align: left;
+    padding: 8px 10px; font-size: 20px; text-align: left;
     border-bottom: 1px solid #eee;
   }
   table th { color: #999; font-weight: normal; }
   table tr:last-child td { border-bottom: none; font-weight: bold; color: #1a73e8; }
-  .auto-info { font-size: 26px; color: #888; margin-top: 8px; line-height: 1.8; }
+  .auto-info { font-size: 20px; color: #888; margin-top: 8px; line-height: 1.8; }
   .auto-info span { color: #333; font-weight: bold; }
 
   @media (max-width: 500px) {
@@ -144,7 +144,7 @@
       <option value="4">4色</option>
       <option value="5">5色</option>
     </select>
-    <span class="auto-info" style="font-size:12px">机台：<span id="printMachine">—</span></span>
+    <span class="auto-info" style="font-size:18px">机台：<span id="printMachine">—</span></span>
   </div>
 </div>
 
@@ -152,12 +152,12 @@
 <div class="card">
   <h2>✨ 表面处理</h2>
   <div class="checks" style="margin-bottom:6px">
-    <span style="font-size:24px;color:#888;align-self:center;margin-right:2px">覆膜：</span>
+    <span style="font-size:18px;color:#888;align-self:center;margin-right:2px">覆膜：</span>
     <label><input type="checkbox" data-key="lamBright" onchange="toggleCheck(this);calc()">亮膜</label>
     <label><input type="checkbox" data-key="lamMatte" onchange="toggleCheck(this);calc()">哑膜</label>
   </div>
   <div class="checks" style="margin-bottom:8px">
-    <span style="font-size:24px;color:#888;align-self:center;margin-right:2px">上油：</span>
+    <span style="font-size:18px;color:#888;align-self:center;margin-right:2px">上油：</span>
     <label><input type="checkbox" data-key="oilBright" onchange="toggleCheck(this);calc()">亮油</label>
     <label><input type="checkbox" data-key="oilMatte" onchange="toggleCheck(this);calc()">哑油</label>
     <label><input type="checkbox" data-key="oilUV" onchange="toggleCheck(this);calc()">UV油</label>
@@ -194,16 +194,16 @@
 <div class="card">
   <h2>✂️ 模切 · 糊盒 · 运费</h2>
   <div class="row">
-    <label style="display:flex;align-items:center;gap:3px;cursor:pointer;min-width:auto;font-size:12px">
+    <label style="display:flex;align-items:center;gap:3px;cursor:pointer;min-width:auto;font-size:18px">
       <input type="checkbox" id="hasDieCut" checked onchange="calc()" style="flex:none;min-width:auto;"> 模切
     </label>
-    <label style="display:flex;align-items:center;gap:3px;cursor:pointer;min-width:auto;font-size:12px">
+    <label style="display:flex;align-items:center;gap:3px;cursor:pointer;min-width:auto;font-size:18px">
       <input type="checkbox" id="noDieFee" style="flex:none;min-width:auto;"> 不算刀版费
     </label>
-    <label style="display:flex;align-items:center;gap:3px;cursor:pointer;min-width:auto;font-size:12px">
+    <label style="display:flex;align-items:center;gap:3px;cursor:pointer;min-width:auto;font-size:18px">
       <input type="checkbox" id="hasGlue" checked onchange="calc()" style="flex:none;min-width:auto;"> 糊盒
     </label>
-    <label style="display:flex;align-items:center;gap:3px;cursor:pointer;min-width:auto;font-size:12px">
+    <label style="display:flex;align-items:center;gap:3px;cursor:pointer;min-width:auto;font-size:18px">
       <input type="checkbox" id="hasShip" checked onchange="calc()" style="flex:none;min-width:auto;"> 运费
     </label>
   </div>
@@ -215,7 +215,7 @@
       <option value="丽水">丽水 0.18</option>
       <option value="建瓯/松阳">建瓯/松阳 0.25</option>
     </select>
-    <span class="auto-info" style="font-size:12px">模切机台：<span id="dieCutMachine">—</span></span>
+    <span class="auto-info" style="font-size:18px">模切机台：<span id="dieCutMachine">—</span></span>
   </div>
 </div>
 
@@ -251,11 +251,11 @@
 </div>
 
 <div class="card" id="detailCard" style="display:none">
-  <h2 style="cursor:pointer" onclick="document.getElementById('detailTable').classList.toggle('collapsed')">📋 费用明细 <span style="font-size:12px;color:#999">(点击展开/收起)</span></h2>
+  <h2 style="cursor:pointer" onclick="document.getElementById('detailTable').classList.toggle('collapsed')">📋 费用明细 <span style="font-size:18px;color:#999">(点击展开/收起)</span></h2>
   <table id="detailTable"></table>
 </div>
 
-<div style="text-align:center;color:#bbb;font-size:12px;margin-top:10px">
+<div style="text-align:center;color:#bbb;font-size:18px;margin-top:10px">
   彩盒计价器 v1.0 · Made with ❤️
 </div>
 
@@ -537,7 +537,7 @@ function calc() {
   let html = '<tr><th>项目</th><th>计算方式</th><th style="text-align:right">单盒（元）</th></tr>';
   for (const item of items) {
     const perBox = item.cost / quantity;
-    html += `<tr><td>${item.name}</td><td style="font-size:12px;color:#888">${item.formula || ''}</td><td style="text-align:right">${perBox.toFixed(4)}</td></tr>`;
+    html += `<tr><td>${item.name}</td><td style="font-size:18px;color:#888">${item.formula || ''}</td><td style="text-align:right">${perBox.toFixed(4)}</td></tr>`;
   }
   html += `<tr style="font-weight:bold"><td>单盒成本合计</td><td></td><td style="text-align:right">${perBoxCost.toFixed(4)}</td></tr>`;
   html += `<tr><td>最终报价（×${(1+profit/100).toFixed(2)}）</td><td>利润 ${profit}%</td><td style="text-align:right;font-size:16px;color:#e74c3c">¥${finalPerBox.toFixed(3)}</td></tr>`;
@@ -624,10 +624,10 @@ function renderArchives() {
   let html = '<tr><th>日期</th><th>客户</th><th>报价</th><th>备注</th><th></th></tr>';
   for (const a of filtered) {
     html += `<tr>
-      <td style="font-size:12px;white-space:nowrap">${a.date}</td>
+      <td style="font-size:18px;white-space:nowrap">${a.date}</td>
       <td>${a.customer}</td>
       <td style="color:#e74c3c;font-weight:bold">¥${a.finalPrice}</td>
-      <td style="font-size:12px;color:#888">${a.note||''}</td>
+      <td style="font-size:18px;color:#888">${a.note||''}</td>
       <td><button onclick="delArchive(${a.id})" style="background:none;border:none;cursor:pointer;font-size:16px">🗑</button></td>
     </tr>`;
   }
