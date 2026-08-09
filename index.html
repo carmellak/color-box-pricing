@@ -146,7 +146,10 @@
       <option value="4">4色</option>
       <option value="5">5色</option>
     </select>
-    <span class="auto-info" style="font-size:18px">机台：<span id="printMachine">—</span></span>
+    <label>机台</label>
+    <select id="printMachine" onchange="calc()">
+      <option value="auto">自动匹配</option>
+    </select>
   </div>
 </div>
 
@@ -211,7 +214,10 @@
       <option value="丽水">丽水 0.18</option>
       <option value="建瓯/松阳">建瓯/松阳 0.25</option>
     </select>
-    <span class="auto-info" style="font-size:18px">模切机台：<span id="dieCutMachine">—</span></span>
+    <label>机台</label>
+    <select id="dieCutMachine" onchange="calc()" style="flex:1">
+      <option value="auto">自动匹配</option>
+    </select>
   </div>
 </div>
 
@@ -281,6 +287,19 @@ const lamPrices = { '亮膜': 0.3, '哑膜': 0.35 };
 const oilPrices = { '亮油': 0.2, '哑油': 0.28, 'UV油': 0.45 };
 
 // ===== UI =====
+function populateMachines() {
+  // 填充印刷机台选项
+  const pm = document.getElementById('printMachine');
+  while (pm.options.length > 1) pm.remove(1);
+  printMachines.forEach((m, i) => { pm.add(new Option(m.name, i)); });
+  
+  // 填充模切机台选项
+  const dm = document.getElementById('dieCutMachine');
+  while (dm.options.length > 1) dm.remove(1);
+  dieCutMachines.forEach((m, i) => { dm.add(new Option(m.name, i)); });
+}
+populateMachines();
+
 function updateSizes() {
   const knifeL = parseFloat(document.getElementById('knifeL').value) || 0;
   const knifeW = parseFloat(document.getElementById('knifeW').value) || 0;
@@ -295,8 +314,13 @@ function updateSizes() {
   let pm = null, dm = null;
   for (const m of printMachines) { if (fLcm <= m.maxL && fWcm <= m.maxW) { pm = m; break; } }
   for (const m of dieCutMachines) { if (faceL <= m.maxL && faceW <= m.maxW) { dm = m; break; } }
-  document.getElementById('printMachine').textContent = pm ? pm.name : '—';
-  document.getElementById('dieCutMachine').textContent = dm ? dm.name : '—';
+  const pms = document.getElementById('printMachine');
+  if (pm) pms.value = printMachines.indexOf(pm);
+  else pms.value = 'auto';
+  
+  const dms = document.getElementById('dieCutMachine');
+  if (dm && document.getElementById('hasDieCut').checked) dms.value = dieCutMachines.indexOf(dm);
+  else dms.value = 'auto';
 }
 
 function toggleFlute() {
@@ -392,17 +416,17 @@ function calc() {
   const faceLcm = faceL / 10;
   const faceWcm = faceW / 10;
   let printM = null;
-  for (const m of printMachines) {
-    if (faceLcm <= m.maxL && faceWcm <= m.maxW) { printM = m; break; }
-  }
-  document.getElementById('printMachine').textContent = printM ? printM.name : '超出最大机台范围';
+  for (const m of printMachines) { if (faceLcm <= m.maxL && faceWcm <= m.maxW) { printM = m; break; } }
+  
+  const pms = document.getElementById('printMachine');
+  if (pms.value !== 'auto') printM = printMachines[parseInt(pms.value)];
 
   // 匹配模切机台
   let dieM = null;
-  for (const m of dieCutMachines) {
-    if (faceL <= m.maxL && faceW <= m.maxW) { dieM = m; break; }
-  }
-  document.getElementById('dieCutMachine').textContent = dieM ? dieM.name : '超出最大机台范围';
+  for (const m of dieCutMachines) { if (faceL <= m.maxL && faceW <= m.maxW) { dieM = m; break; } }
+  
+  const dms = document.getElementById('dieCutMachine');
+  if (dms.value !== 'auto') dieM = dieCutMachines[parseInt(dms.value)];
 
   if (!knifeL || !knifeW || !quantity || !up || !printM || (hasDieCut && !dieM)) {
     document.getElementById('finalPrice').textContent = '—';
