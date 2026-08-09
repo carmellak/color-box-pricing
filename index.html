@@ -589,6 +589,7 @@ function calc() {
   <h2>📚 存档记录</h2>
   <div class="row">
     <label>搜索</label><input type="text" id="archiveSearch" placeholder="客户名或备注" oninput="renderArchives()">
+    <button onclick="exportCSV()" style="padding:7px 16px;background:#28a745;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px">📥 导出CSV</button>
   </div>
   <table id="archiveTable" style="margin-top:8px"></table>
 </div>
@@ -672,18 +673,53 @@ function delArchive(id) {
 const origCalc = calc;
 calc = function() {
   origCalc();
+  const g = id => document.getElementById(id)?.value || '';
+  const cb = key => document.querySelector(`[data-key="${key}"]`)?.checked || false;
   lastCalcData = {
     finalPrice: document.getElementById('finalPrice').textContent.replace('¥ ',''),
-    knifeL: document.getElementById('knifeL').value,
-    knifeW: document.getElementById('knifeW').value,
-    up: document.getElementById('up').value,
-    quantity: document.getElementById('quantity').value,
-    profit: document.getElementById('profit').value,
-    faceTon: document.getElementById('faceTon').value,
-    faceGram: document.getElementById('faceGram').value,
+    knifeL: g('knifeL'), knifeW: g('knifeW'), up: g('up'), waste: g('waste'),
+    faceTon: g('faceTon'), faceGram: g('faceGram'),
+    hasFlute: document.getElementById('hasFlute').checked,
+    flutePrice: g('flutePrice'),
+    colors: g('colorCount'),
+    lamBright: cb('lamBright'), lamMatte: cb('lamMatte'),
+    oilBright: cb('oilBright'), oilMatte: cb('oilMatte'), oilUV: cb('oilUV'),
+    emboss: cb('emboss'), hotStamp: cb('hotStamp'), window: cb('window'),
+    mount: document.getElementById('mountCheck').checked,
+    hasDieCut: document.getElementById('hasDieCut').checked,
+    noDieFee: document.getElementById('noDieFee').checked,
+    hasGlue: document.getElementById('hasGlue').checked,
+    hasShip: document.getElementById('hasShip').checked,
+    shipZone: g('shipZone'),
+    quantity: g('quantity'), profit: g('profit'),
     detailHTML: document.getElementById('detailTable').innerHTML,
   };
 };
+
+// 导出功能
+function exportCSV() {
+  if (archives.length === 0) return;
+  const heads = ['日期','客户','报价','刀版长','刀版宽','拼数','抛量','面纸吨价','面纸克重',
+    '浪纸','浪纸单价','色数','覆膜亮','覆膜哑','上油亮','上油哑','UV油',
+    '压纹','烫金','开窗','裱瓦','模切','刀版费','糊盒','运费','区域','数量','利润','备注'];
+  const keys = ['date','customer','finalPrice','knifeL','knifeW','up','waste','faceTon','faceGram',
+    'hasFlute','flutePrice','colors','lamBright','lamMatte','oilBright','oilMatte','oilUV',
+    'emboss','hotStamp','window','mount','hasDieCut','noDieFee','hasGlue','hasShip','shipZone','quantity','profit','note'];
+  const rows = [heads.join(',')];
+  for (const a of archives) {
+    rows.push(keys.map(k => {
+      let v = a[k] ?? '';
+      if (typeof v === 'boolean') v = v ? '是' : '否';
+      if (typeof v === 'string') v = v.replace(/,/g,'，').replace(/\n/g,' ');
+      return v;
+    }).join(','));
+  }
+  const blob = new Blob(['\uFEFF'+rows.join('\n')], {type:'text/csv;charset=utf-8'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = '彩盒报价存档_' + new Date().toISOString().slice(0,10) + '.csv';
+  link.click();
+}
 
 // Show archives on load or button
 renderArchives();
