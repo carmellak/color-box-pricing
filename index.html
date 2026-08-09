@@ -570,8 +570,29 @@ function calc() {
   html += `<tr style="font-weight:bold"><td>单盒成本合计</td><td></td><td style="text-align:right">${perBoxCost.toFixed(4)}</td></tr>`;
   html += `<tr><td>最终报价（×${(1+profit/100).toFixed(2)}）</td><td>利润 ${profit}%</td><td style="text-align:right;font-size:16px;color:#e74c3c">¥${finalPerBox.toFixed(3)}</td></tr>`;
   document.getElementById('detailTable').innerHTML = html;
+  document.getElementById('saveCard').style.display = 'block';
 }
 </script>
+
+<div class="card" id="saveCard" style="display:none;text-align:center">
+  <h2>💾 保存留档</h2>
+  <div class="row">
+    <label>客户</label><input type="text" id="archiveCust" placeholder="客户名称">
+    <label>备注</label><input type="text" id="archiveNote" placeholder="备注信息">
+  </div>
+  <div style="margin-top:8px">
+    <button onclick="saveArchive()" style="padding:10px 40px;background:#1a73e8;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-weight:bold">💾 保存</button>
+  </div>
+</div>
+
+<div class="card" id="archiveCard" style="display:none">
+  <h2>📚 存档记录</h2>
+  <div class="row">
+    <label>搜索</label><input type="text" id="archiveSearch" placeholder="客户名或备注" oninput="renderArchives()">
+  </div>
+  <table id="archiveTable" style="margin-top:8px"></table>
+</div>
+
 <script>
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').then(reg => {
@@ -586,6 +607,87 @@ if ('serviceWorker' in navigator) {
     });
   });
 }
+</script>
+
+<script>
+// ===== 存档功能 =====
+let archives = JSON.parse(localStorage.getItem('caiheArchives') || '[]');
+let lastCalcData = null;
+
+function saveArchive() {
+  const cust = document.getElementById('archiveCust').value.trim();
+  const note = document.getElementById('archiveNote').value.trim();
+  if (!cust) { alert('请填写客户名称'); return; }
+  
+  archives.unshift({
+    id: Date.now(),
+    customer: cust,
+    note: note,
+    date: new Date().toLocaleDateString('zh-CN'),
+    ...lastCalcData
+  });
+  if (archives.length > 200) archives.length = 200;
+  localStorage.setItem('caiheArchives', JSON.stringify(archives));
+  
+  document.getElementById('archiveCust').value = '';
+  document.getElementById('archiveNote').value = '';
+  document.getElementById('saveCard').style.display = 'none';
+  renderArchives();
+  document.getElementById('archiveCard').style.display = 'block';
+}
+
+function renderArchives() {
+  const q = (document.getElementById('archiveSearch')?.value || '').toLowerCase();
+  const filtered = q ? archives.filter(a => 
+    a.customer.toLowerCase().includes(q) || (a.note||'').toLowerCase().includes(q)
+  ) : archives;
+  
+  if (filtered.length === 0) {
+    document.getElementById('archiveTable').innerHTML = 
+      '<tr><td style="color:#bbb;text-align:center;padding:16px">暂无记录</td></tr>';
+    return;
+  }
+  
+  let html = '<tr><th>日期</th><th>客户</th><th>报价</th><th>备注</th><th></th></tr>';
+  for (const a of filtered) {
+    html += `<tr>
+      <td style="font-size:12px;white-space:nowrap">${a.date}</td>
+      <td>${a.customer}</td>
+      <td style="color:#e74c3c;font-weight:bold">¥${a.finalPrice}</td>
+      <td style="font-size:12px;color:#888">${a.note||''}</td>
+      <td><button onclick="delArchive(${a.id})" style="background:none;border:none;cursor:pointer;font-size:16px">🗑</button></td>
+    </tr>`;
+  }
+  document.getElementById('archiveTable').innerHTML = html;
+}
+
+function delArchive(id) {
+  if (!confirm('确定删除这条记录？')) return;
+  archives = archives.filter(a => a.id !== id);
+  localStorage.setItem('caiheArchives', JSON.stringify(archives));
+  renderArchives();
+}
+
+// Store last calc result for saving
+const origCalc = calc;
+calc = function() {
+  origCalc();
+  lastCalcData = {
+    finalPrice: document.getElementById('finalPrice').textContent.replace('¥ ',''),
+    knifeL: document.getElementById('knifeL').value,
+    knifeW: document.getElementById('knifeW').value,
+    up: document.getElementById('up').value,
+    quantity: document.getElementById('quantity').value,
+    profit: document.getElementById('profit').value,
+    faceTon: document.getElementById('faceTon').value,
+    faceGram: document.getElementById('faceGram').value,
+    detailHTML: document.getElementById('detailTable').innerHTML,
+  };
+};
+
+// Show archives on load or button
+renderArchives();
+if (archives.length > 0) document.getElementById('archiveCard').style.display = 'block';
 </script>
 </body>
 </html>
