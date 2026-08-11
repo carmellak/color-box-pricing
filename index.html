@@ -147,7 +147,8 @@
       <option value="5">5色</option>
     </select>
     <label>机台</label>
-    <select id="printMachine" onchange="calc()"></select>
+    <select id="printMachine" onchange="calc()" disabled></select>
+    <span onclick="this.previousElementSibling.disabled=!this.previousElementSibling.disabled;this.textContent=this.previousElementSibling.disabled?'🔒':'🔓'" style="cursor:pointer;font-size:14px" title="点击解锁手动选择">🔒</span>
   </div>
 </div>
 
@@ -217,7 +218,8 @@
       <option value="建瓯/松阳">建瓯/松阳 0.25</option>
     </select>
     <label>机台</label>
-    <select id="dieCutMachine" onchange="calc()" style="flex:1"></select>
+    <select id="dieCutMachine" onchange="calc()" style="flex:1" disabled></select>
+    <span onclick="this.previousElementSibling.disabled=!this.previousElementSibling.disabled;this.textContent=this.previousElementSibling.disabled?'🔒':'🔓'" style="cursor:pointer;font-size:14px" title="点击解锁手动选择">🔒</span>
   </div>
 </div>
 
