@@ -120,7 +120,7 @@
   </div>
   <div class="row">
     <label>拼数</label><input type="number" id="up" placeholder="必填" min="1" step="1" >
-    <label>抛量</label><input type="number" id="waste" value="180" min="0" step="1" >
+    <label>面纸抛量</label><input type="number" id="wasteFace" value="180" min="0" step="1" >
     <span class="unit">张</span>
   </div>
   <div class="row">
@@ -186,6 +186,10 @@
   <div class="row" id="fluteRow">
     <label>平方单价</label><input type="number" id="flutePrice" placeholder="元/㎡" step="0.01" >
     <span class="unit">元/㎡</span>
+  </div>
+  <div class="row">
+    <label>浪纸损耗</label><input type="number" id="wasteFlute" value="30" min="0" step="1" >
+    <span class="unit">张</span>
   </div>
   <div class="row">
     <label style="display:flex;align-items:center;gap:4px;cursor:pointer;min-width:auto;">
@@ -328,6 +332,7 @@ function toggleFlute() {
   document.getElementById('fluteRow').style.display = has ? '' : 'none';
   if (!has) {
     document.getElementById('flutePrice').value = '';
+    document.getElementById('wasteFlute').value = '30';
     document.getElementById('mountCheck').checked = false;
   } else {
     document.getElementById('mountCheck').checked = true;
@@ -385,7 +390,8 @@ function calc() {
   const colors = parseInt(document.getElementById('colorCount').value);
   const quantity = parseInt(document.getElementById('quantity').value) || 0;
   const up = parseInt(document.getElementById('up').value) || 0;
-  const waste = parseInt(document.getElementById('waste').value) || 0;
+  const wasteFace = parseInt(document.getElementById('wasteFace').value) || 180;
+  const wasteFlute = parseInt(document.getElementById('wasteFlute').value) || 30;
   const profit = parseFloat(document.getElementById('profit').value) || 15;
   const noDieFee = document.getElementById('noDieFee').checked;
   const hasFlute = document.getElementById('hasFlute').checked;
@@ -396,7 +402,8 @@ function calc() {
 
   // 拼数：一个面纸出几个盒
   const sheets = Math.ceil(quantity / up);
-  const totalSheets = sheets + waste;
+  const faceSheets = sheets + wasteFace;
+  const fluteSheets = sheets + wasteFlute;
 
   // 面纸/浪纸尺寸
   const faceL = knifeL + 20;
@@ -437,42 +444,42 @@ function calc() {
 
   // 面料成本（含抛量）
   const facePerSheet = faceArea * faceGram * faceTon / 1000000;
-  const faceTotal = facePerSheet * totalSheets;
+  const faceTotal = facePerSheet * faceSheets;
 
-  // 浪纸成本（含抛量）
+  // 浪纸成本（含损耗）
   const flutePerSheet = hasFlute ? fluteArea * flutePrice : 0;
-  const fluteTotal = flutePerSheet * totalSheets;
+  const fluteTotal = flutePerSheet * fluteSheets;
 
-  // 印刷费（按总张数，含抛量）
+  // 印刷费（按面纸张数）
   const printBase = colors === 4 ? printM.c4base : printM.c5base;
   const printRate = colors === 4 ? printM.c4rate : printM.c5rate;
   let printFee;
-  if (totalSheets <= 3000) {
+  if (faceSheets <= 3000) {
     printFee = printBase;
   } else {
-    printFee = printBase + (totalSheets - 3000) * printRate;
+    printFee = printBase + (faceSheets - 3000) * printRate;
   }
 
   // 后道工序
   let lamFee = 0, oilFee = 0, embossFee = 0, hotStampFee = 0, windowFee = 0, mountFee = 0;
 
   if (document.querySelector('[data-key="lamBright"]').checked) {
-    lamFee += faceArea * lamPrices['亮膜'] * totalSheets;
+    lamFee += faceArea * lamPrices['亮膜'] * faceSheets;
   }
   if (document.querySelector('[data-key="lamMatte"]').checked) {
-    lamFee += faceArea * lamPrices['哑膜'] * totalSheets;
+    lamFee += faceArea * lamPrices['哑膜'] * faceSheets;
   }
   if (document.querySelector('[data-key="oilBright"]').checked) {
-    oilFee += faceArea * oilPrices['亮油'] * totalSheets;
+    oilFee += faceArea * oilPrices['亮油'] * faceSheets;
   }
   if (document.querySelector('[data-key="oilMatte"]').checked) {
-    oilFee += faceArea * oilPrices['哑油'] * totalSheets;
+    oilFee += faceArea * oilPrices['哑油'] * faceSheets;
   }
   if (document.querySelector('[data-key="oilUV"]').checked) {
-    oilFee += faceArea * oilPrices['UV油'] * totalSheets;
+    oilFee += faceArea * oilPrices['UV油'] * faceSheets;
   }
   if (document.querySelector('[data-key="emboss"]').checked) {
-    embossFee = totalSheets * 0.15 + 100;
+    embossFee = faceSheets * 0.15 + 100;
   }
   if (document.querySelector('[data-key="hotStamp"]').checked) {
     hotStampFee = quantity * 0.3;
@@ -481,11 +488,11 @@ function calc() {
     windowFee = quantity * 0.06;
   }
   if (document.getElementById('mountCheck').checked) {
-    mountFee = faceArea * 0.2 * totalSheets;
+    mountFee = faceArea * 0.2 * faceSheets;
   }
 
   // 模切费（含抛量）
-  const dieCutFee = hasDieCut ? Math.max(dieM.minFee, totalSheets * dieM.rate) : 0;
+  const dieCutFee = hasDieCut ? Math.max(dieM.minFee, faceSheets * dieM.rate) : 0;
 
   // 刀版费
   const diePlateFee = (noDieFee || !hasDieCut) ? 0 : faceArea * 250;
@@ -508,36 +515,36 @@ function calc() {
 
   // 汇总
   const items = [
-    { name: '面纸材料', cost: faceTotal, formula: `${faceArea.toFixed(4)}m² × ${faceGram}g × ${faceTon}元/吨 ÷ 10⁶ × ${totalSheets}张` },
+    { name: '面纸材料', cost: faceTotal, formula: `${faceArea.toFixed(4)}m² × ${faceGram}g × ${faceTon}元/吨 ÷ 10⁶ × ${faceSheets}张` },
   ];
-  if (hasFlute) items.push({ name: '浪纸材料', cost: fluteTotal, formula: `${fluteArea.toFixed(4)}m² × ${flutePrice}元/m² × ${totalSheets}张` });
+  if (hasFlute) items.push({ name: '浪纸材料', cost: fluteTotal, formula: `${fluteArea.toFixed(4)}m² × ${flutePrice}元/m² × ${fluteSheets}张` });
   
-  if (totalSheets <= 3000) {
+  if (faceSheets <= 3000) {
     items.push({ name: '印刷费', cost: printFee, formula: `${colors}色 ${printM.name} 底价` });
   } else {
-    items.push({ name: '印刷费', cost: printFee, formula: `${printBase} + (${totalSheets}−3000) × ${printRate}` });
+    items.push({ name: '印刷费', cost: printFee, formula: `${printBase} + (${faceSheets}−3000) × ${printRate}` });
   }
   
   if (lamFee > 0) {
     const parts = [];
     if (document.querySelector('[data-key="lamBright"]').checked) parts.push(`亮膜`);
     if (document.querySelector('[data-key="lamMatte"]').checked) parts.push(`哑膜`);
-    items.push({ name: '覆膜', cost: lamFee, formula: `${faceArea.toFixed(4)}m² × ${parts.join('+')} × ${totalSheets}张` });
+    items.push({ name: '覆膜', cost: lamFee, formula: `${faceArea.toFixed(4)}m² × ${parts.join('+')} × ${faceSheets}张` });
   }
   if (oilFee > 0) {
     const parts = [];
     if (document.querySelector('[data-key="oilBright"]').checked) parts.push(`亮油`);
     if (document.querySelector('[data-key="oilMatte"]').checked) parts.push(`哑油`);
     if (document.querySelector('[data-key="oilUV"]').checked) parts.push(`UV油`);
-    items.push({ name: '上油', cost: oilFee, formula: `${faceArea.toFixed(4)}m² × ${parts.join('+')} × ${totalSheets}张` });
+    items.push({ name: '上油', cost: oilFee, formula: `${faceArea.toFixed(4)}m² × ${parts.join('+')} × ${faceSheets}张` });
   }
-  if (embossFee > 0) items.push({ name: '压纹', cost: embossFee, formula: `${totalSheets}张 × 0.15 + 100上机费` });
+  if (embossFee > 0) items.push({ name: '压纹', cost: embossFee, formula: `${faceSheets}张 × 0.15 + 100上机费` });
   if (hotStampFee > 0) items.push({ name: '烫金/银', cost: hotStampFee, formula: `${quantity}个 × 0.3` });
   if (windowFee > 0) items.push({ name: '开窗贴片', cost: windowFee, formula: `${quantity}个 × 0.06` });
-  if (mountFee > 0) items.push({ name: '裱瓦', cost: mountFee, formula: `${faceArea.toFixed(4)}m² × 0.2 × ${totalSheets}张` });
+  if (mountFee > 0) items.push({ name: '裱瓦', cost: mountFee, formula: `${faceArea.toFixed(4)}m² × 0.2 × ${faceSheets}张` });
   
   if (hasDieCut) {
-    items.push({ name: '模切费', cost: dieCutFee, formula: `max(${dieM.minFee}, ${totalSheets}×${dieM.rate}) ${dieM.name}` });
+    items.push({ name: '模切费', cost: dieCutFee, formula: `max(${dieM.minFee}, ${faceSheets}×${dieM.rate}) ${dieM.name}` });
     if (!noDieFee) items.push({ name: '刀版费', cost: diePlateFee, formula: `${faceArea.toFixed(4)}m² × 250` });
   }
   if (hasGlue) items.push({ name: '糊盒费', cost: glueTotal, formula: `${quantity}个 × ${glueFee} (瓦楞${(Math.max(knifeL,knifeW)/10).toFixed(0)}cm档)` });
