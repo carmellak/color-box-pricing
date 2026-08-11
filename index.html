@@ -147,9 +147,7 @@
       <option value="5">5色</option>
     </select>
     <label>机台</label>
-    <select id="printMachine" onchange="calc()">
-      <option value="auto">自动匹配</option>
-    </select>
+    <select id="printMachine" onchange="calc()"></select>
   </div>
 </div>
 
@@ -219,9 +217,7 @@
       <option value="建瓯/松阳">建瓯/松阳 0.25</option>
     </select>
     <label>机台</label>
-    <select id="dieCutMachine" onchange="calc()" style="flex:1">
-      <option value="auto">自动匹配</option>
-    </select>
+    <select id="dieCutMachine" onchange="calc()" style="flex:1"></select>
   </div>
 </div>
 
@@ -292,14 +288,9 @@ const oilPrices = { '亮油': 0.2, '哑油': 0.28, 'UV油': 0.45 };
 
 // ===== UI =====
 function populateMachines() {
-  // 填充印刷机台选项
   const pm = document.getElementById('printMachine');
-  while (pm.options.length > 1) pm.remove(1);
   printMachines.forEach((m, i) => { pm.add(new Option(m.name, i)); });
-  
-  // 填充模切机台选项
   const dm = document.getElementById('dieCutMachine');
-  while (dm.options.length > 1) dm.remove(1);
   dieCutMachines.forEach((m, i) => { dm.add(new Option(m.name, i)); });
 }
 populateMachines();
@@ -319,12 +310,11 @@ function updateSizes() {
   for (const m of printMachines) { if (fLcm <= m.maxL && fWcm <= m.maxW) { pm = m; break; } }
   for (const m of dieCutMachines) { if (faceL <= m.maxL && faceW <= m.maxW) { dm = m; break; } }
   const pms = document.getElementById('printMachine');
-  if (pm) pms.value = printMachines.indexOf(pm);
-  else pms.value = 'auto';
+  pms.value = pm ? printMachines.indexOf(pm) : '';
   
   const dms = document.getElementById('dieCutMachine');
   if (dm && document.getElementById('hasDieCut').checked) dms.value = dieCutMachines.indexOf(dm);
-  else dms.value = 'auto';
+  else dms.value = '';
 }
 
 function toggleFlute() {
@@ -426,14 +416,14 @@ function calc() {
   for (const m of printMachines) { if (faceLcm <= m.maxL && faceWcm <= m.maxW) { printM = m; break; } }
   
   const pms = document.getElementById('printMachine');
-  if (pms.value !== 'auto') printM = printMachines[parseInt(pms.value)];
+  printM = printMachines[parseInt(pms.value)] || printM;
 
   // 匹配模切机台
   let dieM = null;
   for (const m of dieCutMachines) { if (faceL <= m.maxL && faceW <= m.maxW) { dieM = m; break; } }
   
   const dms = document.getElementById('dieCutMachine');
-  if (dms.value !== 'auto') dieM = dieCutMachines[parseInt(dms.value)];
+  dieM = dieCutMachines[parseInt(dms.value)] || dieM;
 
   if (!knifeL || !knifeW || !quantity || !up || !printM || (hasDieCut && !dieM)) {
     document.getElementById('finalPrice').textContent = '—';
