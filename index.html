@@ -304,7 +304,7 @@ function updateSizes() {
   const knifeL = parseFloat(document.getElementById('knifeL').value) || 0;
   const knifeW = parseFloat(document.getElementById('knifeW').value) || 0;
   const hasFlute = document.getElementById('hasFlute').checked;
-  const faceL = knifeL + 20, faceW = knifeW + 20;
+  const faceL = knifeL + 20, faceW = Math.ceil((knifeW + 20) / 50) * 50;
   const fluteL = knifeL + 10, fluteW = knifeW + 10;
   document.getElementById('faceSize').value = knifeL ? `${faceL.toFixed(1)} × ${faceW.toFixed(1)} mm` : '';
   document.getElementById('fluteSize').value = !hasFlute ? '无浪纸' : (knifeL ? `${fluteL.toFixed(1)} × ${fluteW.toFixed(1)} mm` : '');
@@ -400,7 +400,7 @@ function calc() {
 
   // 面纸/浪纸尺寸
   const faceL = knifeL + 20;
-  const faceW = knifeW + 20;
+  const faceW = Math.ceil((knifeW + 20) / 50) * 50;
   const fluteL = knifeL + 10;
   const fluteW = knifeW + 10;
 
