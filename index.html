@@ -305,7 +305,7 @@ function updateSizes() {
   const knifeW = parseFloat(document.getElementById('knifeW').value) || 0;
   const hasFlute = document.getElementById('hasFlute').checked;
   const faceL = knifeL + 20, faceW = Math.ceil((knifeW + 20) / 50) * 50;
-  const fluteL = knifeL + 10, fluteW = knifeW + 10;
+  const fluteL = knifeL + 10, fluteW = knifeW + 30;
   document.getElementById('faceSize').value = knifeL ? `${faceL.toFixed(1)} × ${faceW.toFixed(1)} mm` : '';
   document.getElementById('fluteSize').value = !hasFlute ? '无浪纸' : (knifeL ? `${fluteL.toFixed(1)} × ${fluteW.toFixed(1)} mm` : '');
   
@@ -402,7 +402,7 @@ function calc() {
   const faceL = knifeL + 20;
   const faceW = Math.ceil((knifeW + 20) / 50) * 50;
   const fluteL = knifeL + 10;
-  const fluteW = knifeW + 10;
+  const fluteW = knifeW + 30;
 
   // 面积 (㎡)
   const faceArea = (faceL / 1000) * (faceW / 1000);
