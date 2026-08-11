@@ -266,10 +266,10 @@
 <script>
 // ===== 数据 =====
 const printMachines = [
-  { name: '105对开', maxL: 101.5, maxW: 71.5, minL: 50, minW: 45, c4base: 350, c4rate: 0.07, c5base: 550, c5rate: 0.11 },
-  { name: '142全开(115×85)', maxL: 115, maxW: 85, minL: 0, minW: 0, c4base: 520, c4rate: 0.11, c5base: 800, c5rate: 0.14 },
-  { name: '142全开(132×97)', maxL: 132, maxW: 97, minL: 0, minW: 0, c4base: 650, c4rate: 0.16, c5base: 900, c5rate: 0.22 },
-  { name: '142全开(145×104)', maxL: 145, maxW: 104, minL: 76, minW: 52, c4base: 750, c4rate: 0.22, c5base: 1150, c5rate: 0.27 },
+  { name: '105对开', maxL: 1015, maxW: 715, minL: 500, minW: 450, c4base: 350, c4rate: 0.07, c5base: 550, c5rate: 0.11 },
+  { name: '142全开(1150×850)', maxL: 1150, maxW: 850, minL: 0, minW: 0, c4base: 520, c4rate: 0.11, c5base: 800, c5rate: 0.14, needThick: true },
+  { name: '142全开(1320×970)', maxL: 1320, maxW: 970, minL: 0, minW: 0, c4base: 650, c4rate: 0.16, c5base: 900, c5rate: 0.22 },
+  { name: '142全开(1450×1040)', maxL: 1450, maxW: 1040, minL: 760, minW: 520, c4base: 750, c4rate: 0.22, c5base: 1150, c5rate: 0.27 },
 ];
 
 const dieCutMachines = [
@@ -306,12 +306,12 @@ function updateSizes() {
   document.getElementById('faceSize').value = knifeL ? `${faceL.toFixed(1)} × ${faceW.toFixed(1)} mm` : '';
   document.getElementById('fluteSize').value = !hasFlute ? '无浪纸' : (knifeL ? `${fluteL.toFixed(1)} × ${fluteW.toFixed(1)} mm` : '');
   
-  // 匹配机台
-  const fLcm = faceL / 10, fWcm = faceW / 10;
+  // 匹配机台 (尺寸为mm)
   const faceGram = parseFloat(document.getElementById('faceGram').value) || 0;
   let pm = null, dm = null;
   for (const m of printMachines) {
-    if (fLcm <= m.maxL && fWcm <= m.maxW && fLcm >= m.minL && fWcm >= m.minW) { pm = m; break; }
+    if (m.needThick && faceGram < 400) continue;
+    if (faceL <= m.maxL && faceW <= m.maxW) { pm = m; break; }
   }
   for (const m of dieCutMachines) { if (faceL <= m.maxL && faceW <= m.maxW) { dm = m; break; } }
   const pms = document.getElementById('printMachine');
@@ -414,12 +414,11 @@ function calc() {
   document.getElementById('faceSize').value = knifeL ? `${faceL.toFixed(1)} × ${faceW.toFixed(1)} mm` : '';
   document.getElementById('fluteSize').value = !hasFlute ? '无浪纸' : (knifeL ? `${fluteL.toFixed(1)} × ${fluteW.toFixed(1)} mm` : '');
 
-  // 匹配印刷机台
-  const faceLcm = faceL / 10, faceWcm = faceW / 10;
+  // 匹配印刷机台 (尺寸为mm)
   let printM = null;
   for (const m of printMachines) {
-    if (m.thickOnly && faceGram < 400) continue;
-    if (faceLcm <= m.maxL && faceWcm <= m.maxW && faceLcm >= m.minL && faceWcm >= m.minW) { printM = m; break; }
+    if (m.needThick && faceGram < 400) continue;
+    if (faceL <= m.maxL && faceW <= m.maxW) { printM = m; break; }
   }
   
   const pms = document.getElementById('printMachine');
