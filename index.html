@@ -464,10 +464,10 @@ function calc() {
   let lamFee = 0, oilFee = 0, embossFee = 0, hotStampFee = 0, windowFee = 0, mountFee = 0;
 
   if (document.querySelector('[data-key="lamBright"]').checked) {
-    lamFee += faceArea * lamPrices['亮膜'] * faceSheets;
+    lamFee += faceArea * lamPrices['亮膜'] * sheets;
   }
   if (document.querySelector('[data-key="lamMatte"]').checked) {
-    lamFee += faceArea * lamPrices['哑膜'] * faceSheets;
+    lamFee += faceArea * lamPrices['哑膜'] * sheets;
   }
   if (document.querySelector('[data-key="oilBright"]').checked) {
     oilFee += faceArea * oilPrices['亮油'] * faceSheets;
@@ -529,7 +529,7 @@ function calc() {
     const parts = [];
     if (document.querySelector('[data-key="lamBright"]').checked) parts.push(`亮膜`);
     if (document.querySelector('[data-key="lamMatte"]').checked) parts.push(`哑膜`);
-    items.push({ name: '覆膜', cost: lamFee, formula: `${faceArea.toFixed(4)}m² × ${parts.join('+')} × ${faceSheets}张` });
+    items.push({ name: '覆膜', cost: lamFee, formula: `${faceArea.toFixed(4)}m² × ${parts.join('+')} × ${sheets}张` });
   }
   if (oilFee > 0) {
     const parts = [];
