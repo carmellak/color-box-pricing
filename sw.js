@@ -1,4 +1,4 @@
-const CACHE = 'caihe-v1';
+const CACHE = 'caihe-v2';
 
 self.addEventListener('install', e => { self.skipWaiting(); });
 
