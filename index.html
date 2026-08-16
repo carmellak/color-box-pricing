@@ -18,6 +18,9 @@
   .row label { min-width: 5em; font-weight: 600; color: #475569; }
   .row input, .row select { flex: 1; min-width: 80px; padding: 10px 12px; font-size: 1.3rem; border: 2px solid #e2e8f0; border-radius: 10px; background: #f8fafc; color: #1e293b; transition: border-color .15s, box-shadow .15s; }
   .row input:focus, .row select:focus { border-color: #6366f1; outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
+  .row.pair { flex-wrap: nowrap; }
+  .row.pair label { min-width: 0; flex: 0 0 auto; }
+  .row.pair input, .row.pair select { min-width: 0; flex: 1 1 0; }
   .info { font-size: 0.9rem; color: #94a3b8; margin: 4px 0; }
   .val { font-weight: 700; color: #f59e0b; }
   button { display: block; width: 100%; padding: 14px; font-size: 1.35rem; font-weight: 700; background: linear-gradient(135deg, #4f46e5, #6366f1); color: #fff; border: none; border-radius: 12px; cursor: pointer; margin: 14px 0; box-shadow: 0 4px 14px rgba(79,70,229,0.3); transition: transform .1s, box-shadow .1s; }
@@ -57,7 +60,7 @@
   <h2>🔪 刀版 · 面纸 · 印刷</h2>
 
   <h3>📐 刀版尺寸</h3>
-  <div class="row">
+  <div class="row pair">
     <label>刀版长</label>
     <input id="knifeL" type="number" placeholder="mm" oninput="updateSizes()">
     <label>刀版宽</label>
@@ -81,7 +84,7 @@
   <hr>
 
   <h3>📄 面纸</h3>
-  <div class="row">
+  <div class="row pair">
     <label>克重</label>
     <input id="gsm" type="number" placeholder="g/㎡" oninput="calcAll()">
     <label>吨价</label>
