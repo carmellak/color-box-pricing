@@ -1,8 +1,6 @@
-const CACHE = 'caihe-v2';
+const CACHE = 'caihe-v1';
 
-self.addEventListener('install', e => {
-  self.skipWaiting();
-});
+self.addEventListener('install', e => { self.skipWaiting(); });
 
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(keys =>
@@ -11,7 +9,6 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
-// 网络优先：有网就拿最新，没网才用缓存
 self.addEventListener('fetch', e => {
   e.respondWith(
     fetch(e.request).then(resp => {
@@ -24,7 +21,6 @@ self.addEventListener('fetch', e => {
   );
 });
 
-// 新版本检测：发现新 SW 立即激活
 self.addEventListener('message', e => {
   if (e.data === 'skipWaiting') self.skipWaiting();
 });
